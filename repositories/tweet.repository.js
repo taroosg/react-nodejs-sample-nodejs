@@ -1,0 +1,51 @@
+import admin from "../model/firebase.js";
+const db = admin.firestore();
+
+export const findAll = async () => {
+  try {
+    const tweetSnapshot = await db.collection("tweet").get();
+    const tweets = tweetSnapshot.docs.map((x) => {
+      return {
+        id: x.id,
+        data: {
+          ...x.data(),
+          created_at: x.data().created_at.toDate(),
+          updated_at: x.data().updated_at.toDate(),
+        },
+      };
+    });
+    return tweets;
+  } catch (e) {
+    throw Error("Error while getting All Tweet Data");
+  }
+};
+
+export const find = async (id) => {
+  try {
+    const tweetSnapshot = await db.collection("tweet").doc(id).get();
+    return {
+      id: tweetSnapshot.id,
+      data: {
+        ...tweetSnapshot.data(),
+        created_at: tweetSnapshot.data().created_at.toDate(),
+        updated_at: tweetSnapshot.data().updated_at.toDate(),
+      }
+    }
+  } catch (e) {
+    throw Error("Error while getting One tweet Data");
+  }
+};
+
+export const store = async (data) => {
+  try {
+    const postData = {
+      ...data,
+      created_at: admin.firestore.Timestamp.now(),
+      updated_at: admin.firestore.Timestamp.now(),
+    };
+    const ref = await db.collection("tweet").add(postData);
+    return ref;
+  } catch (e) {
+    throw Error("Error while store Tweet Data");
+  }
+}

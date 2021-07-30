@@ -20,7 +20,7 @@ export const findAll = async () => {
   }
 };
 
-export const find = async (id) => {
+export const find = async ({ id }) => {
   try {
     const tweetSnapshot = await db.collection("tweet").doc(id).get();
     return {
@@ -36,7 +36,7 @@ export const find = async (id) => {
   }
 };
 
-export const store = async (data) => {
+export const store = async ({ data }) => {
   try {
     const postData = {
       ...data,
@@ -49,3 +49,24 @@ export const store = async (data) => {
     throw Error("Error while store Tweet Data");
   }
 }
+
+export const update = async ({ id, data }) => {
+  const updateData = {
+    ...data,
+    updated_at: admin.firestore.Timestamp.now(),
+  };
+  const ref = await db.collection("tweet").doc(id).update(updateData);
+  return {
+    id: id,
+    data: updateData,
+  };
+};
+
+export const destroy = async ({ id }) => {
+  try {
+    const ref = await db.collection('tweet').doc(id).delete();
+    return { id: id, };
+  } catch (e) {
+    throw Error("Error while deleting Todo Data");
+  }
+};
